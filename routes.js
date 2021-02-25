@@ -140,8 +140,13 @@ routes.put("/cart-items/:id", (req, res) => {
 routes.delete("/cart-items/:id", (req, res) => {
   let id = parseInt(req.params.id);
   let index = cartItems.findIndex((item) => item.id === id);
-  cartItems.splice(index, 1);
-  res.sendStatus(204);
+  if (index !== -1) {
+    cartItems.splice(index, 1);
+    res.sendStatus(204);
+  } else {
+    res.status(404);
+    res.send(`No item with id: ${id}`);
+  }
 });
 
 module.exports = routes;
