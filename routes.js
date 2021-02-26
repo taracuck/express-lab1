@@ -75,7 +75,7 @@ let cartItems = [
   },
 ];
 
-let nextId = 6;
+let nextId = 12;
 
 // GET /cart-items
 routes.get("/cart-items", (req, res) => {
@@ -84,7 +84,9 @@ routes.get("/cart-items", (req, res) => {
   let prefix = req.query.prefix;
   let pageSize = req.query.pageSize;
   if (maxPrice) {
-    filteredItems = filteredItems.filter((item) => item.price <= maxPrice);
+    filteredItems = filteredItems.filter(
+      (item) => item.price <= parseInt(maxPrice)
+    );
   }
   if (prefix) {
     filteredItems = filteredItems.filter((item) =>
@@ -92,20 +94,21 @@ routes.get("/cart-items", (req, res) => {
     );
   }
   if (pageSize) {
-    filteredItems = filteredItems.slice(0, pageSize);
+    filteredItems = filteredItems.slice(0, parseInt(pageSize));
   }
-  res.json(filteredItems);
   res.status(200);
+  res.json(filteredItems);
 });
 
 // GET /cart-items/:id
 routes.get("/cart-items/:id", (req, res) => {
-  let id = parseInt(req.params.id);
-  let index = cartItems.findIndex((item) => item.id === id);
-  if (index != -1) {
-    res.json(cartItems[index]);
+  let id = req.params.id;
+  let foundItem = cartItems.find((item) => item.id === parseInt(id));
+  if (foundItem) {
     res.status(200);
+    res.json(foundItem);
   } else {
+    // if you send, then do res.status, the status doesn't change. Only changes if the status comes before
     res.status(404);
     res.send(`ID Not Found`);
   }
@@ -138,8 +141,8 @@ routes.put("/cart-items/:id", (req, res) => {
 
 // DELETE /cart-items/:id
 routes.delete("/cart-items/:id", (req, res) => {
-  let id = parseInt(req.params.id);
-  let index = cartItems.findIndex((item) => item.id === id);
+  let id = req.params.id;
+  let index = cartItems.findIndex((item) => item.id === parseInt(id));
   if (index !== -1) {
     cartItems.splice(index, 1);
     res.sendStatus(204);
